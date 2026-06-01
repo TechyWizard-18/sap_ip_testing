@@ -5,9 +5,9 @@ const app = express();
 const config = {
     user: 'DashboardUser',
     password: 'Kar@2022',
-    server: '122.176.63.102',        // Your office PUBLIC IP
+    server: '122.176.63.102',        
     database: 'VINSAK_FY1920',
-    port: 14330,                     // Your SAP port
+    port: 14330,                     
     options: {
         encrypt: false,              
         trustServerCertificate: true 
@@ -15,17 +15,27 @@ const config = {
 };
 
 app.get('/', (req, res) => {
-    res.send("Backend is running. Go to /test-sap to check the database connection.");
+    res.send("SAP B1 Dashboard API is running. Try the /api/partners or /api/items endpoints.");
 });
 
-app.get('/test-sap', async (req, res) => {
+// Endpoint 1: Fetch Top 10 Business Partners (Customers/Vendors)
+app.get('/api/partners', async (req, res) => {
     try {
         const pool = await sql.connect(config);
-        // A simple query just to prove the database responds
-        const result = await pool.request().query('SELECT @@VERSION as SQLVersion'); 
+        // Querying the standard OCRD table for Business Partners
+        const result = await pool.request().query(`
+            SELECT TOP 10 
+                CardCode AS PartnerID, 
+                CardName AS CompanyName, 
+                CardType AS Type, 
+                Balance 
+            FROM OCRD 
+            WHERE CardType = 'C' -- 'C' stands for Customer
+        `); 
+        
         res.json({ 
             success: true, 
-            message: "Successfully fetched data from SAP Database via Render!",
+            count: result.recordset.length,
             data: result.recordset 
         });
         pool.close();
@@ -34,7 +44,30 @@ app.get('/test-sap', async (req, res) => {
     }
 });
 
-// Render provides the PORT dynamically, so we use process.env.PORT
+// Endpoint 2: Fetch Top 10 Inventory Items
+app.get('/api/items', async (req, res) => {
+    try {
+        const pool = await sql.connect(config);
+        // Querying the standard OITM table for Items
+        const result = await pool.request().query(`
+            SELECT TOP 10 
+                ItemCode, 
+                ItemName, 
+                ItmsGrpCod AS ItemGroup 
+            FROM OITM
+        `); 
+        
+        res.json({ 
+            success: true, 
+            count: result.recordset.length,
+            data: result.recordset 
+        });
+        pool.close();
+    } catch (err) {
+        res.status(500).json({ success: false, error: err.message });
+    }
+});
+
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
