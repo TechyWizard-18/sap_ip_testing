@@ -3,8 +3,8 @@ const sql = require('mssql');
 const app = express();
 
 const config = {
-    user: 'DashboardUser',
-    password: 'Kar@2022',
+    user: 'Servicebot',
+    password: 'Viren@2026',
     server: '122.176.63.102',        
     database: 'VINSAK_FY1920',
     port: 14330,                     
@@ -15,7 +15,7 @@ const config = {
 };
 
 app.get('/', (req, res) => {
-    res.send("SAP B1 Dashboard API is running. Try the /api/partners or /api/items endpoints.");
+    res.send("Hello .SAP B1 Dashboard API is running. Try the /api/partners or /api/items endpoints.");
 });
 
 // Endpoint 1: Fetch Top 10 Business Partners (Customers/Vendors)
