@@ -5,7 +5,7 @@ const app = express();
 const config = {
     user: 'Servicebot',
     password: 'Viren@2026',
-    server: '122.176.63.102',        
+    server: '',        
     database: 'VINSAK_FY1920',
     port: 14330,                 
     options: {
